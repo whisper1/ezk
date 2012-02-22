@@ -468,7 +468,7 @@ establish_connection(Ip, Port, WantedTimeout, HeartBeatTime) ->
     case  gen_tcp:connect(Ip,Port,[binary,{packet,4}]) of
 	{ok, Socket} ->
 	    ?LOG(3, "Connection: Socket open"),    
-	    HandshakePacket = <<0:64, WantedTimeout:64, 0:64, 16:64, 0:128>>,
+	    HandshakePacket = <<0:32, 0:64, WantedTimeout:32, 0:64, 16:32, 0:128>>,
 	    ?LOG(3, "Connection: Handshake build"),    
 	    ok = gen_tcp:send(Socket, HandshakePacket),
 	    ?LOG(3, "Connection: Handshake send"),    
@@ -477,7 +477,7 @@ establish_connection(Ip, Port, WantedTimeout, HeartBeatTime) ->
 	    receive
 		{tcp,Socket,Reply} ->
 		    ?LOG(3, "Connection: Handshake Reply there"),    
-		    <<RealTimeout:64, SessionId:64, 16:32, _Hash:128>> = Reply,
+		    <<_ProtoVersion:32, RealTimeout:32, SessionId:64, 16:32, _Hash:128>> = Reply,
 		    Watchtable    = ets:new(watchtable, [duplicate_bag, private]),
 		    InitialState  = #cstate{  
 		      socket = Socket, ip = Ip, 
