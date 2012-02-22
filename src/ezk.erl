@@ -101,7 +101,7 @@
 			  {ok, {ezk_acls(), ezk_getdata()}}.
 
 -spec start_connection/0 :: () -> {ok, ezk_conpid()} | {error, no_server_reached}.
--spec start_connection/1 :: (ezk_server()) ->
+-spec start_connection/1 :: ([ezk_server()]) ->
 					      {ok, ezk_conpid()} |
 				    {error, no_server_reached}.
 -spec end_connection/2   :: (ezk_conpid(), string()) -> ok | {error, no_connection}.
