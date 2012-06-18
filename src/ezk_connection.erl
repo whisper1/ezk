@@ -69,6 +69,7 @@
 
 -define(SERVER, ?MODULE). 
 -define(HEARTBEATTIME, 10000).
+-define(HANDSHAKE_TIMEOUT, 1000).
 
 start(Args) ->
     ?LOG(1,"Connection: Start link called with Args: ~w",[Args]),
@@ -487,11 +488,13 @@ establish_connection(Ip, Port, WantedTimeout, HeartBeatTime) ->
 		    ?LOG(3, "Connection: Initial state build"),         
 		    ok = inet:setopts(Socket,[{active,once}]),
 		    ?LOG(3, "Connection: Startup complete",[]),
-		    ?LOG(3, "Connection: Initial State : ~w",[InitialState])
-	    end,
-	    erlang:send_after(HeartBeatTime, self(), heartbeat),
-	    ?LOG(3,"Connection established with server ~s, ~w ~n",[Ip, Port]),
-	    {ok, InitialState};
+		    ?LOG(3, "Connection: Initial State : ~w",[InitialState]),
+                    erlang:send_after(HeartBeatTime, self(), heartbeat),
+                    ?LOG(3,"Connection established with server ~s, ~w ~n",[Ip, Port]),
+                    {ok, InitialState}
+            after ?HANDSHAKE_TIMEOUT ->
+                    error
+	    end;
 	_Else ->
 	    error
     end.
