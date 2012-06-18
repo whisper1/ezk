@@ -122,9 +122,12 @@ interpret_reply_data(3, _Path, Reply) ->
 %%% get --> Reply = The data stored in the node and then all the nodes  parameters
 interpret_reply_data(4, _Path, Reply) -> 
     ?LOG(3,"P2M: Got a get reply"),
-    <<LengthOfData:32, Data/binary>> = Reply,
+    <<LengthOfData:32/signed-integer, Data/binary>> = Reply,
     ?LOG(3,"P2M: Length of data is ~w",[LengthOfData]),
-    {ReplyData, Left} = split_binary(Data, LengthOfData),
+    {ReplyData, Left} = case LengthOfData of
+                            -1 -> {<<"">>,Data};
+                            _ -> split_binary(Data, LengthOfData)
+                        end,
     ?LOG(3,"P2M: The Parameterdata is ~w",[Left]),    
     ?LOG(3,"P2M: Data is ~w",[ReplyData]),    
     Parameter = getbinary_2_list(Left),
