@@ -61,13 +61,13 @@ init(_Args) ->
 %% starts a connection by using the default servers. Returns 
 %% {ok, PId} if everything works. 
 start_connection() ->
-    gen_server:call(?SERVER, {start_connection, [], []}).
+    gen_server:call(?SERVER, {start_connection, [], []}, infinity).
 %% starts a connection by using a special serverlist.
 %% if serverlist is empty the default servers are used. 
 start_connection(Servers) ->
-    gen_server:call(?SERVER, {start_connection, Servers, []}).
+    gen_server:call(?SERVER, {start_connection, Servers, []}, infinity).
 start_connection(Servers, MonitorPIds) ->
-    gen_server:call(?SERVER, {start_connection, Servers, MonitorPIds}).
+    gen_server:call(?SERVER, {start_connection, Servers, MonitorPIds}, infinity).
 
 %% ends the connection symbolized by the PId. Returns ok or an error message
 end_connection(ConnectionPId, Reason) ->
