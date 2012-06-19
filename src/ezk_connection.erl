@@ -493,6 +493,7 @@ establish_connection(Ip, Port, WantedTimeout, HeartBeatTime) ->
                     ?LOG(3,"Connection established with server ~s, ~w ~n",[Ip, Port]),
                     {ok, InitialState}
             after ?HANDSHAKE_TIMEOUT ->
+                    gen_tcp:close(Socket),
                     error
 	    end;
 	_Else ->
