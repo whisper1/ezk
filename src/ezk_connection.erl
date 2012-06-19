@@ -41,7 +41,7 @@
  	       }).
 
 %% API
--export([start/1,start_link/2]).
+-export([start/1, start_link/1]).
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
@@ -72,11 +72,12 @@
 -define(HANDSHAKE_TIMEOUT, 1000).
 
 start(Args) ->
-    ?LOG(1,"Connection: Start link called with Args: ~w",[Args]),
+    ?LOG(1,"Connection: Start called with Args: ~w",[Args]),
     gen_server:start(?MODULE, Args , []).
 
-start_link(Name, Args) ->
-    gen_server:start_link({local, Name}, ?MODULE, Args, []).
+start_link(Args) ->
+    ?LOG(1,"Connection: Start link called with Args: ~w",[Args]),
+    gen_server:start_link(?MODULE, Args, []).
 
 
 %%-------------------------------------------------------------------------------
