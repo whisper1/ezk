@@ -164,7 +164,7 @@ interpret_reply_data(12, _Path, Reply) ->
     {<<NumberOfAnswers:32>>, Data} = split_binary(Reply, 4),
     {Children, Left} =  get_n_paths(NumberOfAnswers, Data),
     Parameter = getbinary_2_list(Left),
-    [{children, Children}|Parameter].
+    [{children, Children}, Parameter].
 
 %%----------------------------------------------------------------
 %% Little Helpers (internally neede functions)
