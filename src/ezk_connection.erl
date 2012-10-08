@@ -406,7 +406,10 @@ handle_info(heartbeat, State) ->
 	    {stop, {shutdown, heartattack}, State}
     end;
 handle_info({tcp_closed, _Port}, State) ->
-    {stop, {shutdown, heartattacktcp_closed}, State}.
+    {stop, {shutdown, heartattacktcp_closed}, State};
+handle_info(Info, State) ->
+    ?LOG(4, "Unexpected Info~n~p~n", [Info]),
+    {noreply, State}.
 
 %% if server dies all owners who are waiting for watchevents get a Message
 %% M = {watchlost, WatchMessage, Data}.
