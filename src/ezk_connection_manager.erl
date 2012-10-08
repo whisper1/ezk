@@ -126,8 +126,12 @@ handle_call({add_monitors, ConnectionPId, MonitorPIds}, _From, State) ->
     NewState    = State#con_man_state{connections = NewConnections},
     {reply, ok, NewState};
 handle_call({get_connections}, _From, State) ->
-    {reply, {ok, State#con_man_state.connections}, State}.
-
+    {reply, {ok, State#con_man_state.connections}, State};
+handle_call({die, shutdown}, _, _) ->
+    {stop, normal};
+handle_call(Call, _, State) ->
+    ?LOG(4, "Unexpected Call~n~p~n", [Call]),
+    {noreply, State}.
 
 handle_cast(_Mes, State) ->
     {noreply, State}.
