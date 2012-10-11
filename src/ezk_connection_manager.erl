@@ -142,7 +142,7 @@ handle_cast(_Mes, State) ->
 handle_info({'DOWN', MonitorRef, _Type, _Object, _Info}, State) ->
     Connections = State#con_man_state.connections,
     case get_conpid_to_monref(MonitorRef, Connections) of 
-	{ok, ConPId} ->
+	{ok, {ConPId, _}} ->
 	    spawn(fun() ->
 			  end_connection(ConPId, "Essential Process Died") end),
 	    {noreply, State};
