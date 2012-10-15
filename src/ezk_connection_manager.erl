@@ -196,7 +196,7 @@ activate_usable_monitors(MonitorPIds) ->
 				    end, MonitorPre),	   
     Monitors.    
     
-%% The terminate function trys to kill all connections bevore ending.
+%% The terminate function trys to kill all connections before ending.
 terminate(Reason, State) ->
     lists:map(fun({PId, _}) ->
 		      ezk:die(PId, Reason) end,
