@@ -434,11 +434,16 @@ terminate(_Reason, State) ->
 	      end, ok, Watchtable),
     OpenRequests = State#cstate.open_requests,
     dict:map(fun(_Key, {CommId, Path, From}) ->
-		     From ! {error, client_broke, CommId, Path},
+		     extract_con(From) ! {error, client_broke, CommId, Path},
 		     ok
 	     end, OpenRequests),
     ?LOG(1,"Connection: TERMINATING"),
     ok.
+
+extract_con({blocking, Pid}) ->
+    Pid;
+extract_con({nonblocking, Pid, _}) ->
+    Pid.
 
 waitterminateok(Socket) ->
     receive
