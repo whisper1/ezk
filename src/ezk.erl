@@ -318,5 +318,5 @@ get_connections() ->
 die(ConnectionPId) ->
     ezk:die(ConnectionPId, "No offence").
 
-die(ConnectionPId, Reason) ->
+die(ConnectionPId, Reason) when is_pid(ConnectionPId) ->
     ezk_connection:die(ConnectionPId, Reason).
