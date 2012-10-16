@@ -433,17 +433,19 @@ terminate(_Reason, State) ->
 		      ok
 	      end, ok, Watchtable),
     OpenRequests = State#cstate.open_requests,
-    dict:map(fun(_Key, {CommId, Path, From}) ->
-		     extract_con(From) ! {error, client_broke, CommId, Path},
-		     ok
-	     end, OpenRequests),
+    dict:map(fun send_client_broke/2, OpenRequests),
     ?LOG(1,"Connection: TERMINATING"),
     ok.
 
-extract_con({blocking, Pid}) ->
-    Pid;
-extract_con({nonblocking, Pid, _}) ->
-    Pid.
+send_client_broke(_Key, {CommId, Path, {blocking, From}}) when is_pid(From) ->
+    From ! {error, client_broke, CommId, Path};
+send_client_broke(_, {CommId, Path, {nonblocking, From, _}})
+  when is_pid(From) ->
+    From ! {error, client_broke, CommId, Path};
+send_client_broke(_, {_, _, Con}) ->
+    ?LOG(1,"terminate: Con this is not a pid; ~p", [Con]),
+    ok.
+
 
 waitterminateok(Socket) ->
     receive
