@@ -33,16 +33,15 @@
 
 put(NeededLevel, Message, Parameter) ->
     if
-       NeededLevel =< ?LEVEL ->
-	    %%error_logger:info_report([{message, Message}, {parameter, Parameter}]),
-	    io:format(("Logger: " ++ Message++"~n"), Parameter);
-       true -> {}
+        NeededLevel =< ?LEVEL ->
+            %%error_logger:info_report([{message, Message}, {parameter, Parameter}]),
+            io:format(("Logger: " ++ Message++"~n"), Parameter);
+        true -> {}
     end.
 
 put(NeededLevel, Message) ->
     if
-       NeededLevel =< ?LEVEL ->
-	    io:format(("Logger: " ++ Message++"~n"));
+        NeededLevel =< ?LEVEL ->
+            io:format(("Logger: " ++ Message++"~n"));
        true -> {}
     end.
-			   
