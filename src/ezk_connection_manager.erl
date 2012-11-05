@@ -84,10 +84,10 @@ get_connections() ->
 %% Then starts the connection an adds it to the connections list.
 handle_call({start_connection, Servers, MonitorPIds}, _From, State) ->
     case Servers of
-    [] ->
-        UsedServers = State#con_man_state.defaultserverlist;
-    _Else ->
-        UsedServers = Servers
+        [] ->
+            UsedServers = State#con_man_state.defaultserverlist;
+        _Else ->
+            UsedServers = Servers
     end,
     ?LOG(1,"Starting"),
     case ezk_connection:start_link([UsedServers, ?NUMBER_CONNECTION_TRYS]) of
@@ -140,12 +140,12 @@ handle_cast(_Mes, State) ->
 handle_info({'DOWN', MonitorRef, _Type, _Object, _Info}, State) ->
     Connections = State#con_man_state.connections,
     case get_conpid_to_monref(MonitorRef, Connections) of
-    {ok, {ConPId, _}} ->
-        spawn(fun() ->
-                  end_connection(ConPId, "Essential Process Died") end),
-        {noreply, State};
-    _Else ->
-        {noreply, State}
+        {ok, ConPId} ->
+            spawn(fun() ->
+                      end_connection(ConPId, "Essential Process Died") end),
+            {noreply, State};
+        _Else ->
+            {noreply, State}
     end;
 handle_info({'EXIT', ConnectionPId, _}, State) ->
     OldConnections = State#con_man_state.connections,
