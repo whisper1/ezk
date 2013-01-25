@@ -86,7 +86,7 @@ start_link(Args) ->
 %% Kills the Server (not the supervisor!)
 die(ConnectionPId, Reason) when is_pid(ConnectionPId) ->
     ?LOG(3,"Killcommand arrived in commands"),
-    gen_server:call(ConnectionPId, {die, Reason}).
+    call_and_catch(ConnectionPId, {die, Reason}).
 
 %%--------------------------- Zookeeper Functions ---------------------
 %% All Return {ok, Reply} if it worked.
@@ -96,18 +96,18 @@ die(ConnectionPId, Reason) when is_pid(ConnectionPId) ->
 %% Returns {error, auth_failed} if server rejected auth
 %% Returns {error, unknown, ErrorCodeBin} if something new happened
 addauth(ConnectionPId, Scheme, Auth) when is_pid(ConnectionPId) ->
-   gen_server:call(ConnectionPId, {addauth, Scheme, Auth}).
+   call_and_catch(ConnectionPId, {addauth, Scheme, Auth}).
 
 %% Creates a new ZK_Node
 %% Reply = Path where Path = String
 create(ConnectionPId, Path, Data) when is_pid(ConnectionPId) ->
-    gen_server:call(ConnectionPId, {command, {create, Path, Data, [], [undef]}}).
+    call_and_catch(ConnectionPId, {command, {create, Path, Data, [], [undef]}}).
 n_create(ConnectionPId, Path, Data, Receiver, Tag) when is_pid(ConnectionPId) ->
     gen_server:cast(ConnectionPId, {nbcommand, {create, Path, Data, [], [undef]},
                                     Receiver, Tag}).
 %% Typ = e | s | es (stands for etheremal, sequenzed or both)
 create(ConnectionPId, Path, Data, Typ) when is_pid(ConnectionPId) ->
-    gen_server:call(ConnectionPId, {command, {create, Path, Data, Typ, [undef]}}).
+    call_and_catch(ConnectionPId, {command, {create, Path, Data, Typ, [undef]}}).
 n_create(ConnectionPId, Path, Data, Typ, Receiver, Tag)
   when is_pid(ConnectionPId) ->
     gen_server:cast(ConnectionPId, {nbcommand, {create, Path, Data, Typ, [undef]},
@@ -118,7 +118,7 @@ n_create(ConnectionPId, Path, Data, Typ, Receiver, Tag)
 %% and Permission = [Per] | String
 %% where Per = r | w | c | d | a
 create(ConnectionPId, Path, Data, Typ, Acls) when is_pid(ConnectionPId) ->
-    gen_server:call(ConnectionPId, {command, {create, Path, Data, Typ, Acls}}).
+    call_and_catch(ConnectionPId, {command, {create, Path, Data, Typ, Acls}}).
 n_create(ConnectionPId, Path, Data, Typ, Acls, Receiver, Tag)
   when is_pid(ConnectionPId) ->
     gen_server:cast(ConnectionPId, {nbcommand, {create, Path, Data, Typ, Acls},
@@ -128,7 +128,7 @@ n_create(ConnectionPId, Path, Data, Typ, Acls, Receiver, Tag)
 %% Only working if Node has no children.
 %% Reply = Path where Path = String
 delete(ConnectionPId, Path) when is_pid(ConnectionPId) ->
-    gen_server:call(ConnectionPId, {command, {delete,  Path, []}}).
+    call_and_catch(ConnectionPId, {command, {delete,  Path, []}}).
 n_delete(ConnectionPId, Path, Receiver, Tag) when is_pid(ConnectionPId) ->
     gen_server:cast(ConnectionPId, {nbcommand, {delete,  Path, []}, Receiver, Tag}).
 
@@ -175,17 +175,17 @@ delete_all(ConnectionPId, Path) when is_pid(ConnectionPId) ->
 %% a) when path is erased if path existed.
 %% b) when path is created if path did not exist.
 exists(ConnectionPId, Path) when is_pid(ConnectionPId) ->
-    gen_server:call(ConnectionPId, {command, {exists, Path}}).
+    call_and_catch(ConnectionPId, {command, {exists, Path}}).
 exists(ConnectionPId, Path, WatchOwner, WatchMessage)
   when is_pid(ConnectionPId) ->
-    gen_server:call(ConnectionPId, {watchcommand, {exists, existsw, Path, {exi, WatchOwner,
+    call_and_catch(ConnectionPId, {watchcommand, {exists, existsw, Path, {exi, WatchOwner,
                                                                            WatchMessage}}}).
 
 %% Reply = {Data, Parameters} where Data = The Data stored in the Node
 %% and Parameters = {getdata, Czxid, Mzxid, Pzxid, Ctime, Mtime, Dataversion,
 %%                   Datalength, Number_children, Cversion, Aclversion, Ephe_owner}
 get(ConnectionPId, Path) when is_pid(ConnectionPId) ->
-    gen_server:call(ConnectionPId, {command, {get, Path}}).
+    call_and_catch(ConnectionPId, {command, {get, Path}}).
 n_get(ConnectionPId, Path, Receiver, Tag) when is_pid(ConnectionPId) ->
     gen_server:cast(ConnectionPId, {nbcommand, {get, Path}, Receiver, Tag}).
 %% Like the one above but sets a datawatch to Path.
@@ -193,13 +193,13 @@ n_get(ConnectionPId, Path, Receiver, Tag) when is_pid(ConnectionPId) ->
 %% M = {WatchMessage, {Path, Type, SyncCon}
 %% with Type = child
 get(ConnectionPId, Path, WatchOwner, WatchMessage) when is_pid(ConnectionPId) ->
-    gen_server:call(ConnectionPId, {watchcommand, {get, getw, Path, {data, WatchOwner,
+    call_and_catch(ConnectionPId, {watchcommand, {get, getw, Path, {data, WatchOwner,
                                                                      WatchMessage}}}).
 
 %% Returns the actual Acls of a Node
 %% Reply = {[ACL],Parameters} with ACl and Parameters like above
 get_acl(ConnectionPId, Path) when is_pid(ConnectionPId) ->
-    gen_server:call(ConnectionPId, {command, {get_acl, Path}}).
+    call_and_catch(ConnectionPId, {command, {get_acl, Path}}).
 n_get_acl(ConnectionPId, Path, Receiver, Tag) when is_pid(ConnectionPId) ->
     gen_server:cast(ConnectionPId, {nbcommand, {get_acl, Path}, Receiver, Tag}).
 
@@ -207,7 +207,7 @@ n_get_acl(ConnectionPId, Path, Receiver, Tag) when is_pid(ConnectionPId) ->
 %% Dataformat is Binary.
 %% Reply = Parameters with Data like at get
 set(ConnectionPId, Path, Data) when is_pid(ConnectionPId) ->
-    gen_server:call(ConnectionPId, {command, {set, Path, Data}}).
+    call_and_catch(ConnectionPId, {command, {set, Path, Data}}).
 n_set(ConnectionPId, Path, Data, Receiver, Tag) when is_pid(ConnectionPId) ->
     gen_server:cast(ConnectionPId, {nbcommand, {set, Path, Data}, Receiver, Tag}).
 
@@ -215,7 +215,7 @@ n_set(ConnectionPId, Path, Data, Receiver, Tag) when is_pid(ConnectionPId) ->
 %% ACL like above.
 %% Reply = Parameters with Data like at get
 set_acl(ConnectionPId, Path, Acls) when is_pid(ConnectionPId) ->
-    gen_server:call(ConnectionPId, {command, {set_acl, Path, Acls}}).
+    call_and_catch(ConnectionPId, {command, {set_acl, Path, Acls}}).
 n_set_acl(ConnectionPId, Path, Acls, Receiver, Tag)
   when is_pid(ConnectionPId) ->
     gen_server:cast(ConnectionPId, {nbcommand, {set_acl, Path, Acls}, Receiver, Tag}).
@@ -223,20 +223,20 @@ n_set_acl(ConnectionPId, Path, Acls, Receiver, Tag)
 %% Lists all Children of a Node. Paths are given as Binarys!
 %% Reply = [ChildName] where ChildName = <<"Name">>
 ls(ConnectionPId, Path) when is_pid(ConnectionPId) ->
-    gen_server:call(ConnectionPId, {command, {ls, Path}}).
+    call_and_catch(ConnectionPId, {command, {ls, Path}}).
 n_ls(ConnectionPId, Path, Receiver, Tag) when is_pid(ConnectionPId) ->
     gen_server:cast(ConnectionPId, {nbcommand, {ls, Path}, Receiver, Tag}).
 %% like above, but a Childwatch is set to the Node.
 %% Same Reaktion like at get with watch but Type = child
 ls(ConnectionPId, Path, WatchOwner, WatchMessage) when is_pid(ConnectionPId) ->
     ?LOG(3,"Connection: Send lsw"),
-    gen_server:call(ConnectionPId, {watchcommand, {ls, lsw, Path, {child, WatchOwner,
+    call_and_catch(ConnectionPId, {watchcommand, {ls, lsw, Path, {child, WatchOwner,
                                                                    WatchMessage}}}).
 
 %% Lists all Children of a Node. Paths are given as Binarys!
 %% Reply = {[ChildName],Parameters} with Parameters and ChildName like above.
 ls2(ConnectionPId, Path) when is_pid(ConnectionPId) ->
-    gen_server:call(ConnectionPId, {command, {ls2, Path}}).
+    call_and_catch(ConnectionPId, {command, {ls2, Path}}).
 
 n_ls2(ConnectionPId, Path, Receiver, Tag) when is_pid(ConnectionPId) ->
     gen_server:cast(ConnectionPId, {nbcommand, {ls2, Path}, Receiver, Tag}).
@@ -244,13 +244,13 @@ n_ls2(ConnectionPId, Path, Receiver, Tag) when is_pid(ConnectionPId) ->
 %% like above, but a Childwatch is set to the Node.
 %% Same Reaktion like at get with watch but Type = child
 ls2(ConnectionPId, Path, WatchOwner, WatchMessage) when is_pid(ConnectionPId) ->
-    gen_server:call(ConnectionPId, {watchcommand, {ls2, ls2w,Path ,{child, WatchOwner,
+    call_and_catch(ConnectionPId, {watchcommand, {ls2, ls2w,Path ,{child, WatchOwner,
                                                                     WatchMessage}}}).
 
 %% Returns the Actual Transaction Id of the Client.
 %% Reply = Iteration = Int.
 info_get_iterations(ConnectionPId) when is_pid(ConnectionPId) ->
-    gen_server:call(ConnectionPId, {info, get_iterations}).
+    call_and_catch(ConnectionPId, {info, get_iterations}).
 
 %% Gets a path and looks if the corresponding node exists. If
 %% not it is created (along with the whole path).
@@ -277,8 +277,7 @@ ensure_folder(ConnectionPId, PrefixPath) ->
         {ok, _I} ->
             ok;
         {error, _I} ->
-            create(ConnectionPId, PrefixPath,
-               list_to_binary("Created by ensure_path macro"))
+            create(ConnectionPId, PrefixPath, <<>>)
     end.
 
 
@@ -596,3 +595,16 @@ get_receivers(node_created,   Path, Watchtable) ->
 get_receivers(child_changed,  Path, Watchtable) ->
     ChildWatches = ets:lookup(Watchtable, {child, Path}),
     _Receivers   = ChildWatches.
+
+call_and_catch(To, Msg) ->
+    call_and_catch(To, Msg, 15000).
+
+call_and_catch(To, Msg, Timeout) ->
+    case catch gen_server:call(To, Msg, Timeout) of
+        {'EXIT', {noproc, Error}} ->
+            {error, {no_zk_connection, Error}};
+        {'EXIT', Error} ->
+            {error, Error};
+        Other ->
+            Other
+    end.
