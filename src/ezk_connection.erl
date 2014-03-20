@@ -299,7 +299,7 @@ n_init_trys(_Servers, 0) ->
 n_init_trys(Servers, N) ->
     ?LOG(1,"Connect init : incomming args: ~w",[Servers]),
     WhichServer = random:uniform(length(Servers)),
-    ?LOG(0,"Choose server ~w",[WhichServer]),
+    ?LOG(1,"Choose server ~w",[WhichServer]),
     {Ip, Port, WantedTimeout, HeartBeatTime} =  lists:nth(WhichServer, Servers),
     case establish_connection(Ip, Port, WantedTimeout, HeartBeatTime) of
         {ok, State} ->
