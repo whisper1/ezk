@@ -3,6 +3,17 @@
   {description, ""},
   {vsn, "1.0.1"},
   {registered, []},
+  {modules, [
+    ezk_app,
+    ezk,
+    ezk_connection,
+    ezk_connection_manager,
+    ezk_highlander,
+    ezk_log,
+    ezk_message_2_packet,
+    ezk_packet_2_message,
+    ezk_sup
+  ]},
   {applications, [
                   kernel,
                   stdlib

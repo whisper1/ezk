@@ -10,3 +10,5 @@ logs/
 zook*
 *gauss*
 .eunit/
+_rel/
+relx
